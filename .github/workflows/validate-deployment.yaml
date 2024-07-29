@@ -14,49 +14,15 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
 
-    - name: Set up Python
-      uses: actions/setup-python@v4
+    - name: Set up Node.js
+      uses: actions/setup-node@v3
       with:
-        python-version: '3.x'
+        node-version: '16'
 
     - name: Install dependencies
       run: |
-        pip install pyyaml
+        npm install js-yaml
 
     - name: Validate deployment.yaml
       run: |
-        if [ ! -f deployment.yaml ]; then
-          echo "deployment.yaml file not found!"
-          exit 1
-        fi
-
-        if [ ! -d src ]; then
-          echo "'src' directory not found!"
-          exit 1
-        fi
-
-        python3 -c "
-import yaml
-import os
-
-def validate_sql_scripts(scripts):
-    return all(script.endswith('.sql') for script in scripts)
-
-try:
-    with open('deployment.yaml', 'r') as file:
-        data = yaml.safe_load(file)
-        if 'database-deployment' not in data or 'scripts-setup' not in data['database-deployment']:
-            raise ValueError('Invalid structure in deployment.yaml')
-
-        scripts_setup = data['database-deployment']['scripts-setup']
-        if not validate_sql_scripts(scripts_setup):
-            raise ValueError('One or more scripts are not valid SQL files')
-
-        for script in scripts_setup:
-            if not os.path.isfile(script):
-                raise ValueError(f'{script} does not exist')
-
-except Exception as e:
-    print(f'Error: {e}')
-    exit(1)
-        "
+        node validate-deployment.js
