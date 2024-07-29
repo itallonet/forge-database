@@ -1,0 +1,49 @@
+name: Validate Deployment YAML
+
+on:
+  pull_request:
+    paths:
+      - 'deployment.yaml'
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Validate deployment.yaml
+      run: |
+        if [ ! -f deployment.yaml ]; then
+          echo "deployment.yaml file not found!"
+          exit 1
+        fi
+
+        # Check if 'src' directory exists
+        if [ ! -d src ]; then
+          echo "'src' directory not found!"
+          exit 1
+        fi
+
+        # Validate the structure of deployment.yaml
+        python3 -c "
+import yaml
+import os
+
+try:
+    with open('deployment.yaml', 'r') as file:
+        data = yaml.safe_load(file)
+        if 'database-deployment' not in data or 'scripts-setup' not in data['database-deployment']:
+            raise ValueError('Invalid structure in deployment.yaml')
+
+        scripts_setup = data['database-deployment']['scripts-setup']
+        for script in scripts_setup:
+            if not os.path.isfile(script):
+                raise ValueError(f'{script} does not exist')
+
+except Exception as e:
+    print(f'Error: {e}')
+    exit(1)
+        "
