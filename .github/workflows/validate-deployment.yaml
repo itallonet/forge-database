@@ -35,7 +35,7 @@ jobs:
           exit 1
         fi
 
-        python3 - <<EOF
+        python3 -c "
 import yaml
 import os
 
@@ -59,4 +59,4 @@ try:
 except Exception as e:
     print(f'Error: {e}')
     exit(1)
-EOF
+        "
