@@ -1,3 +1,3 @@
 database-deployment:
   scripts-setup:
-    - src/test/script.sql
+    - src/base/0001_entity.sql
