@@ -3,6 +3,6 @@ CREATE TABLE entity_roles (
     active BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMPTZ DEFAULT now(),
     updated_at TIMESTAMPTZ DEFAULT NULL
-    entity_id UUID REFERENCES entity(id) ON DELETE CASCADE,
-    role_id UUID REFERENCES roles(id) ON DELETE CASCADE,
+    entity_id UUID REFERENCES entity(id),
+    role_id UUID REFERENCES roles(id),
 );
